@@ -7,7 +7,7 @@
 
 namespace locoApp {
 
-struct RobotModelOption {
+struct ModelOption {
     enum class Type {
         BOB = 0,
         DOG = 1,
@@ -21,19 +21,17 @@ struct RobotModelOption {
     double swingFootHeight;
 };
 
-const std::vector<RobotModelOption> modelOptions = {
+const std::vector<ModelOption> modelOptions = {
     {
-        RobotModelOption::Type::BOB,                 //
+        ModelOption::Type::BOB,                 //
         "Bob",                                       //
         CRL_DATA_FOLDER "/robots/bob/bob.rbs",  //
         {},
-        0.31,  //
+        0.9,  //
         0.07,  //
     },
-
-    // unitree laikago from rbs
     {
-        RobotModelOption::Type::DOG,                 //
+        ModelOption::Type::DOG,                 //
         "Dog",                                       //
         CRL_DATA_FOLDER "/robots/dog/dog.rbs",  //
         {

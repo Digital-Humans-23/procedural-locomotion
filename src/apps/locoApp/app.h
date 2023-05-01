@@ -113,6 +113,11 @@ private:
         const auto &m = modelOptions[selectedModel];
         const char *rbsFile = m.filePath.c_str();
         robot_ = std::make_shared<crl::loco::LeggedRobot>(rbsFile);
+        robot_->setRootState(crl::P3D(0, m.baseTargetHeight, 0));
+        if(m.type == ModelOption::Type::DOG) {
+            robot_->showMeshes = false;
+            robot_->showSkeleton = true;
+        }
     }
 
 public:
