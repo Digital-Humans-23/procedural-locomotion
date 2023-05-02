@@ -14,7 +14,11 @@ start guide.
 ## Immediate Next steps
 
 - Implement an inverse kinematics solver: ```src/libs/loco/include/loco/kinematics/IK_Solver.h```
-    - feel free to modify and use the one from [a1](https://github.com/Digital-Humans-23/a1)
+    - Complete TODO part.
+    - Feel free to modify and use the one from [a1](https://github.com/Digital-Humans-23/a1)
+- Complete a base (body) trajectory planning
+  strategy: ```src/libs/loco/include/loco/planner/LocomotionPlannerHelpers.h```
+    - Feel free to modify and use the one from [a1](https://github.com/Digital-Humans-23/a1)
 - Design a strategy for arm motions. Modify ```src/libs/loco/include/loco/planner``` files to implement your strategy.
 - Review biomechanics, computer graphics and robotics literature for a natural ankle motion. This is the most
   crucial step for successful demo!

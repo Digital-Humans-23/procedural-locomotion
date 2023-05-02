@@ -40,7 +40,7 @@ if (NOT TARGET eigen)
             URL_HASH MD5=994092410ba29875184f7725e0371596
     )
     fetch(eigen)
-    add_library(eigen INTERFACE)
+    add_library(eigen INTERFACE ../src/libs/loco/include/loco/planner/GaitPlanner.h)
     add_library(Eigen3::Eigen ALIAS eigen)
     target_include_directories(eigen SYSTEM INTERFACE ${eigen_SOURCE_DIR})
 endif ()

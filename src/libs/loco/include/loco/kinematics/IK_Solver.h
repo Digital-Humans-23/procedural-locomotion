@@ -6,14 +6,14 @@
 namespace crl::loco {
 
 struct IK_EndEffectorTargets {
-    RB *rb = nullptr;
+    std::shared_ptr<RB> rb = nullptr;
     P3D p;       // local coordinates of end effector in rb's frame
     P3D target;  // target position in world frame
 };
 
 class IK_Solver {
 public:
-    IK_Solver(Robot *robot) : robot(robot) {}
+    IK_Solver(const std::shared_ptr<Robot> &robot) : robot(robot) {}
 
     ~IK_Solver(void) {}
 
@@ -21,7 +21,7 @@ public:
      * add IK end effector target to solver. Specify the end effector point p, which 
      * is specified in the local coordinates of rb and its target expressed in world frame.
      */
-    void addEndEffectorTarget(RB *rb, P3D p, P3D target) {
+    void addEndEffectorTarget(const std::shared_ptr<RB> &rb, P3D p, P3D target) {
         endEffectorTargets.push_back(IK_EndEffectorTargets());
         endEffectorTargets.back().rb = rb;
         endEffectorTargets.back().p = p;
@@ -37,7 +37,7 @@ public:
 
             // get current generalized coordinates of the robots
 
-            // TODO: Ex.2-2 Inverse Kinematics
+            // TODO: Inverse Kinematics
             //
             // update generalized coordinates of the robot by solving IK.
 
@@ -71,7 +71,7 @@ public:
     }
 
 private:
-    Robot *robot;
+    std::shared_ptr<Robot> robot;
     std::vector<IK_EndEffectorTargets> endEffectorTargets;
 };
 

@@ -14,24 +14,22 @@ namespace crl::loco {
  */
 class KinematicTrackingController : public LocomotionController {
 public:
-    LeggedRobot *robot;
-    IK_Solver *ikSolver = nullptr;
+    std::shared_ptr<LeggedRobot> robot;
+    std::shared_ptr<IK_Solver> ikSolver = nullptr;
 
 public:
     /**
      * constructor
      */
-    KinematicTrackingController(LocomotionTrajectoryPlanner *planner) : LocomotionController(planner) {
+    KinematicTrackingController(const std::shared_ptr<LocomotionTrajectoryPlanner> &planner) : LocomotionController(planner) {
         this->robot = planner->robot;
-        ikSolver = new IK_Solver(robot);
+        ikSolver = std::make_shared<IK_Solver>(robot);
     }
 
     /**
      * destructor
      */
-    virtual ~KinematicTrackingController(void) {
-        delete ikSolver;
-    }
+    ~KinematicTrackingController(void) override = default;
 
     void generateMotionTrajectories(double dt = 1.0 / 30) override {
         planner->planGenerationTime = planner->simTime;
@@ -47,10 +45,10 @@ public:
         robot->setRootState(targetPos, targetOrientation);
 
         // now we solve inverse kinematics for each limbs
-        for (uint i = 0; i < robot->limbs.size(); i++) {
-            P3D target = planner->getTargetLimbEEPositionAtTime(robot->limbs[i], planner->getSimTime() + dt);
+        for (uint i = 0; i < robot->getLimbCount(); i++) {
+            P3D target = planner->getTargetLimbEEPositionAtTime(robot->getLimb(i), planner->getSimTime() + dt);
 
-            ikSolver->addEndEffectorTarget(robot->limbs[i]->eeRB, robot->limbs[i]->ee->endEffectorOffset, target);
+            ikSolver->addEndEffectorTarget(robot->getLimb(i)->eeRB, robot->getLimb(i)->ee->endEffectorOffset, target);
         }
 
         ikSolver->solve();
@@ -69,4 +67,4 @@ public:
     }
 };
 
-}  // namespace crl
+}  // namespace crl::loco

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <crl-basic/gui/renderer.h>
+#include <crl-basic/utils/trajectory.h>
 #include <loco/planner/BodyFrame.h>
 #include <loco/planner/FootFallPattern.h>
 #include <loco/planner/LocomotionPlannerHelpers.h>
@@ -8,7 +9,6 @@
 #include <loco/robot/RB.h>
 #include <loco/robot/RBJoint.h>
 #include <loco/robot/RBUtils.h>
-#include <crl-basic/utils/trajectory.h>
 
 namespace crl::loco {
 
@@ -31,7 +31,7 @@ namespace crl::loco {
 class SimpleLocomotionTrajectoryPlanner : public LocomotionTrajectoryPlanner {
 protected:
     //store cartesian trajectories for each foot
-    std::map<const RobotLimb*, Trajectory3D> limbTrajectories;
+    std::map<const shared_ptr<RobotLimb>, Trajectory3D> limbTrajectories;
 
     //store reference trajectory for the robot's body frame
     bFrameReferenceMotionPlan bFrameMotionPlan;
@@ -45,8 +45,7 @@ public:
     /**
          * constructor
          */
-    SimpleLocomotionTrajectoryPlanner(LeggedRobot* bot)
-        : LocomotionTrajectoryPlanner(bot), bFrameMotionPlan(bot) {
+    SimpleLocomotionTrajectoryPlanner(const std::shared_ptr<LeggedRobot>& bot) : LocomotionTrajectoryPlanner(bot), bFrameMotionPlan(bot) {
         generateTrajectoriesFromCurrentState();
     }
 
@@ -58,8 +57,7 @@ public:
         bFrameMotionPlan.targetSidewaysSpeed = speedSideways;
         bFrameMotionPlan.targetTurngingSpeed = turningSpeed;
         bFrameMotionPlan.tStart = simTime;
-        bFrameMotionPlan.tEnd =
-            simTime + tPlanningHorizon + tPlanningHorizonBuffer;
+        bFrameMotionPlan.tEnd = simTime + tPlanningHorizon + tPlanningHorizonBuffer;
 
         lmProps.stepWidthOffsetX = stepWidthModifier;
         lmProps.swingFootHeight = targetStepHeight;
@@ -77,10 +75,8 @@ public:
 
     void generateLimbTrajectories(double dt) {
         //and full motion trajectories for each limb
-        for (uint i = 0; i < robot->limbs.size(); i++) {
-            limbTrajectories[robot->limbs[i]] = fsp.generateLimbTrajectory(
-                robot->limbs[i], lmProps, simTime, simTime + tPlanningHorizon,
-                dt, groundHeight);
+        for (uint i = 0; i < robot->getLimbCount(); i++) {
+            limbTrajectories[robot->getLimb(i)] = fsp.generateLimbTrajectory(robot->getLimb(i), lmProps, simTime, simTime + tPlanningHorizon, dt, groundHeight);
         }
     }
 
@@ -94,43 +90,31 @@ public:
         generateLimbTrajectories(dt);
     }
 
-    virtual P3D getTargetLimbEEPositionAtTime(const RobotLimb* l, double t) {
+    virtual P3D getTargetLimbEEPositionAtTime(const std::shared_ptr<RobotLimb>& l, double t) {
         return P3D() + limbTrajectories[l].evaluate_linear(t);
     }
 
     virtual P3D getTargetTrunkPositionAtTime(double t) {
-        return P3D() +
-               bFrameMotionPlan.bFramePosTrajectory.evaluate_linear(
-                   t);  // +RBGlobals::worldUp.cross(robot->forward) * 0.05 * sin(5 * t);
+        return P3D() + bFrameMotionPlan.bFramePosTrajectory.evaluate_linear(t);  // +RBGlobals::worldUp.cross(robot->forward) * 0.05 * sin(5 * t);
     }
 
     virtual double getTargetTrunkHeadingAtTime(double t) {
-        return bFrameMotionPlan.bFrameHeadingTrajectory.evaluate_linear(t) +
-               trunkYaw;
+        return bFrameMotionPlan.bFrameHeadingTrajectory.evaluate_linear(t) + trunkYaw;
     }
 
     virtual Quaternion getTargetTrunkOrientationAtTime(double t) {
-        return getRotationQuaternion(getTargetTrunkHeadingAtTime(t),
-                                     V3D(0, 1, 0)) *
-               getRotationQuaternion(trunkPitch,
-                                     RBGlobals::worldUp.cross(robot->forward)) *
-               getRotationQuaternion(trunkRoll, robot->forward);
+        return getRotationQuaternion(getTargetTrunkHeadingAtTime(t), V3D(0, 1, 0)) *
+               getRotationQuaternion(trunkPitch, RBGlobals::worldUp.cross(robot->getForward())) * getRotationQuaternion(trunkRoll, robot->getForward());
     }
 
     virtual void drawTrajectories(gui::Shader* shader) {
-        for (int i = 0; i < bFrameMotionPlan.bFramePosTrajectory.getKnotCount();
-             i++)
-            drawSphere(
-                P3D() + bFrameMotionPlan.bFramePosTrajectory.getKnotValue(i),
-                0.02, *shader);
+        for (int i = 0; i < bFrameMotionPlan.bFramePosTrajectory.getKnotCount(); i++)
+            drawSphere(P3D() + bFrameMotionPlan.bFramePosTrajectory.getKnotValue(i), 0.02, *shader);
 
-        for (uint i = 0; i < robot->limbs.size(); i++)
-            for (int j = 0;
-                 j < limbTrajectories[robot->limbs[i]].getKnotCount(); j++)
-                drawSphere(
-                    P3D() + limbTrajectories[robot->limbs[i]].getKnotValue(j),
-                    0.01, *shader, V3D(1, 1, 0));
+        for (uint i = 0; i < robot->getLimbCount(); i++)
+            for (int j = 0; j < limbTrajectories[robot->getLimb(i)].getKnotCount(); j++)
+                drawSphere(P3D() + limbTrajectories[robot->getLimb(i)].getKnotValue(j), 0.01, *shader, V3D(1, 1, 0));
     }
 };
 
-}  // namespace crl
+}  // namespace crl::loco

@@ -12,10 +12,10 @@ namespace crl::loco {
  */
 class LocomotionController {
 public:
-    LocomotionTrajectoryPlanner* planner = nullptr;
+    std::shared_ptr<LocomotionTrajectoryPlanner> planner = nullptr;
 
 public:
-    LocomotionController(LocomotionTrajectoryPlanner* planner) : planner(planner) {}
+    LocomotionController(const std::shared_ptr<LocomotionTrajectoryPlanner>& planner) : planner(planner) {}
 
     virtual ~LocomotionController(){};
 
@@ -54,4 +54,4 @@ public:
     virtual void plotDebugInfo() = 0;
 };
 
-}  // namespace crl
+}  // namespace crl::loco

@@ -78,12 +78,12 @@ public:
     //Whomever populates the footstep plan should also set the contact plan manager adequately;
     //the two are closely link, as they store complementary information
     ContactPlanManager* cpm = nullptr;
-    std::map<const RobotLimb*, DynamicArray<PlannedLimbContact>> footSteps;
+    std::map<const std::shared_ptr<RobotLimb>, DynamicArray<PlannedLimbContact>> footSteps;
 
     //if the limb is in stance at time t, we'll be returning the current planned
     //position of the contact point; if the limb is in swing at time t, we'll
     //be returning the planned contact position for the end of the swing phase
-    P3D getCurrentOrUpcomingPlannedContactLocation(RobotLimb* limb, double t) {
+    P3D getCurrentOrUpcomingPlannedContactLocation(const std::shared_ptr<RobotLimb>& limb, double t) {
         for (uint i = 0; i < footSteps[limb].size(); i++) {
             if (t < footSteps[limb][i].tEnd)
                 return footSteps[limb][i].contactLocation;
@@ -91,7 +91,7 @@ public:
         return P3D();
     }
 
-    PlannedLimbContact* getCurrentOrUpcomingPlannedLimbContact(RobotLimb* limb, double t) {
+    PlannedLimbContact* getCurrentOrUpcomingPlannedLimbContact(const std::shared_ptr<RobotLimb>& limb, double t) {
         for (uint i = 0; i < footSteps[limb].size(); i++) {
             if (t < footSteps[limb][i].tEnd)
                 return &footSteps[limb][i];
@@ -100,7 +100,7 @@ public:
         return nullptr;
     }
 
-    int getIndexOfCurrentOrUpcomingPlannedLimbContact(RobotLimb* limb, double t) {
+    int getIndexOfCurrentOrUpcomingPlannedLimbContact(const std::shared_ptr<RobotLimb>& limb, double t) {
         for (uint i = 0; i < footSteps[limb].size(); i++) {
             if (t < footSteps[limb][i].tEnd)
                 return i;
@@ -110,7 +110,8 @@ public:
     }
 
     //given world coordinates for the step locations, generate continuous trajectories for each of a robot's feet
-    Trajectory3D generateLimbTrajectory(RobotLimb* limb, const LimbMotionProperties& lmp, double tStart, double tEnd, double dt, double groundHeight = 0) {
+    Trajectory3D generateLimbTrajectory(const std::shared_ptr<RobotLimb>& limb, const LimbMotionProperties& lmp, double tStart, double tEnd, double dt,
+                                        double groundHeight = 0) {
         double t = tStart;
         Trajectory3D traj;
 
@@ -222,7 +223,7 @@ private:
             vSideways = targetSidewaysSpeed;
             turningSpeed = targetTurngingSpeed;
 
-            // TODO: Ex.3 Trajectory Planning
+            // TODO: Trajectory Planning
             //
             // update "pos" and "headingAngle".
             // compute nextstep's "pos" and "headingAngle" by integrating "vForward", "vSideways" and "turningSpeed".
@@ -252,9 +253,9 @@ public:
     double targetbFrameHeight = 0;
 
     //and the robot we apply this to
-    LeggedRobot* robot = nullptr;
+    std::shared_ptr<LeggedRobot> robot = nullptr;
 
-    bFrameReferenceMotionPlan(LeggedRobot* robot) {
+    bFrameReferenceMotionPlan(const std::shared_ptr<LeggedRobot>& robot) {
         this->robot = robot;
     }
 
@@ -291,7 +292,7 @@ public:
     // compute the body frame position and heading based on the
     // position/orientation of the robot's trunk
     bFrameState getInitialConditionsFromCurrentTrunkState() {
-        bFrameState initialBFrameState = getBFrameStateFromRBState(robot->trunk->state);
+        bFrameState initialBFrameState = getBFrameStateFromRBState(robot->getTrunk()->getState());
         return initialBFrameState;
     }
 
@@ -307,8 +308,8 @@ public:
     void populateFootstepPlan(FootstepPlan& fsp, const LimbMotionProperties& lmProps, ContactPlanManager* cpm, double groundHeight = 0) {
         fsp.cpm = cpm;
         double tTiny = 0.0001;
-        for (uint i = 0; i < robot->limbs.size(); i++) {
-            RobotLimb* limb = robot->limbs[i];
+        for (uint i = 0; i < robot->getLimbCount(); i++) {
+            const auto& limb = robot->getLimb(i);
             fsp.footSteps[limb].clear();
             ContactPhaseInfo cpi = cpm->getCPInformationFor(limb, tStart);
             double t = tStart;

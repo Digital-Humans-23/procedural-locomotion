@@ -12,7 +12,7 @@ namespace crl::loco {
 class SwingPhaseContainer {
 public:
     // this is the limb the swing phase is applied to...
-    RobotLimb *limb;
+    std::shared_ptr<RobotLimb> limb;
 
     // keep track of when a contact should be broken (e.g. a foot lifts), and
     // when it should be established again - the swing phase is defined to take
@@ -20,7 +20,7 @@ public:
     DynamicArray<pair<double, double>> swingPhases;
 
 public:
-    SwingPhaseContainer(RobotLimb *l) {
+    SwingPhaseContainer(const std::shared_ptr<RobotLimb> &l) {
         limb = l;
     }
 
@@ -59,7 +59,7 @@ public:
         clearAllBodyOffsetTrajectories();
     }
 
-    void addSwingPhaseForLimb(RobotLimb *l, double start, double end) {
+    void addSwingPhaseForLimb(const std::shared_ptr<RobotLimb> &l, double start, double end) {
         // the following must hold for a swing phase
         //	1) it must start before it ends
         //	2) the interval (start, end) must have a non-zero intersection
@@ -182,7 +182,7 @@ public:
     DynamicArray<SwingPhaseContainer> cs;
 
 public:
-    void addSwingPhaseForLimb(RobotLimb *l, double start, double end) {
+    void addSwingPhaseForLimb(const std::shared_ptr<RobotLimb> &l, double start, double end) {
         if (!(start < end)) {
             assert(false);
             return;
@@ -232,7 +232,7 @@ public:
                                  startTime + ls.swingPhases.front().second * pg.strideDuration);
     }
 
-    SwingPhaseContainer *getSwingPhaseContainerForLimb(RobotLimb *l) {
+    SwingPhaseContainer *getSwingPhaseContainerForLimb(const std::shared_ptr<RobotLimb> &l) {
         for (uint i = 0; i < cs.size(); i++)
             if (cs[i].limb == l)
                 return &cs[i];
@@ -244,7 +244,7 @@ public:
      * time t, if the limb is in swing or stance mode, time remaining for the
      * current contact configuration, etc...
      */
-    ContactPhaseInfo getContactPhaseInformation(const RobotLimb *l, double t) {
+    ContactPhaseInfo getContactPhaseInformation(const const std::shared_ptr<RobotLimb> &l, double t) {
         SwingPhaseContainer *spc = nullptr;
         for (uint i = 0; i < cs.size(); i++)
             if (cs[i].limb == l) {
@@ -332,7 +332,7 @@ public:
             strideUpdates.erase(strideUpdates.begin());
     }
 
-    ContactPhaseInfo getCPInformationFor(const RobotLimb *limb, double t) {
+    ContactPhaseInfo getCPInformationFor(const std::shared_ptr<RobotLimb> &limb, double t) {
         return cs.getContactPhaseInformation(limb, t);
     }
 

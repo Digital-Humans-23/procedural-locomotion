@@ -26,7 +26,7 @@ public:
     //and this is the time when the current set of motions was generated
     double planGenerationTime = 0;
 
-    LeggedRobot* robot = nullptr;
+    std::shared_ptr<LeggedRobot> robot = nullptr;
     ContactPlanManager cpm;
     // this is the length (in seconds) of the planning horizon that we are
     // considering here...
@@ -53,7 +53,7 @@ public:
     /**
      * constructor
      */
-    LocomotionTrajectoryPlanner(LeggedRobot* bot) {
+    LocomotionTrajectoryPlanner(const std::shared_ptr<LeggedRobot>& bot) {
         this->robot = bot;
     }
 
@@ -78,7 +78,7 @@ public:
         cpm.appendPeriodicGaitToPlanningHorizon(p);
     }
 
-    ContactPhaseInfo getCPInformationFor(const RobotLimb* l, double t) {
+    ContactPhaseInfo getCPInformationFor(const std::shared_ptr<RobotLimb>& l, double t) {
         return cpm.getCPInformationFor(l, t);
     }
 
@@ -92,7 +92,7 @@ public:
 
     virtual void refineCurrentMPCTrajectory() {}
 
-    virtual P3D getTargetLimbEEPositionAtTime(const RobotLimb* l, double t) = 0;
+    virtual P3D getTargetLimbEEPositionAtTime(const std::shared_ptr<RobotLimb>& l, double t) = 0;
 
     virtual P3D getTargetTrunkPositionAtTime(double t) = 0;
 
@@ -107,10 +107,10 @@ public:
 
     virtual Quaternion getTargetTrunkOrientationAtTime(double t) {
         return getRotationQuaternion(getTargetTrunkHeadingAtTime(t), V3D(0, 1, 0)) *
-               getRotationQuaternion(trunkPitch, RBGlobals::worldUp.cross(robot->forward)) * getRotationQuaternion(trunkRoll, robot->forward);
+               getRotationQuaternion(trunkPitch, RBGlobals::worldUp.cross(robot->getForward())) * getRotationQuaternion(trunkRoll, robot->getForward());
     }
 
-    virtual V3D getTargetLimbEEVelocityAtTime(const RobotLimb* l, double t, double dt = 1 / 30.0) {
+    virtual V3D getTargetLimbEEVelocityAtTime(const std::shared_ptr<RobotLimb>& l, double t, double dt = 1 / 30.0) {
         P3D delta = getTargetLimbEEPositionAtTime(l, t + dt) - getTargetLimbEEPositionAtTime(l, t);
         return V3D(delta) / dt;
     }
