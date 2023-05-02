@@ -22,7 +22,14 @@ start guide.
 
 5. Press the space bar to play the app. You can give joystick command with arrow keys in your keyboard. If it does not
    move, don't freak out. It's normal. You have to implement a base (body) trajectory planning strategy as well as a
-   inverse kinematics solver: recall [a1](https://github.com/Digital-Humans-23/a1). 
+   inverse kinematics solver: recall [a1](https://github.com/Digital-Humans-23/a1). Once you've done that, you will see
+   something like this.
+
+![Baseline](img/baseline.gif)
+
+6. Of course, we don't want this crappy walking motion. Now, try your best to generate more natural motions for our poor
+   Bob! But first, play around the code, and try understanding it. Don't hesitate to contact Dongho (kangd@ethz.ch) if
+   you have any question regarding the implementation.
 
 ## Immediate Next steps
 

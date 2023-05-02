@@ -24,18 +24,18 @@ struct ModelOption {
 const std::vector<ModelOption> modelOptions = {
     {
         ModelOption::Type::BOB,                 //
-        "Bob",                                       //
+        "Bob",                                  //
         CRL_DATA_FOLDER "/robots/bob/bob.rbs",  //
         {
             {"l", "lFoot"},
             {"r", "rFoot"},
         },
-        0.9,  //
-        0.07,  //
+        0.9,   //
+        0.15,  //
     },
     {
         ModelOption::Type::DOG,                 //
-        "Dog",                                       //
+        "Dog",                                  //
         CRL_DATA_FOLDER "/robots/dog/dog.rbs",  //
         {
             {"fl", "tibia_0"},  //
