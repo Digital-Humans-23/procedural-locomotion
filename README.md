@@ -11,14 +11,24 @@ start guide.
 
 1. Fork this repository and download the code.
 
+2. Build the project (or build `locoApp`). You can build the project in cmake Release mode for realtime performance:
+   see [this](https://www.jetbrains.com/help/clion/cmake-profile.html) for a guide about cmake profile for CLion.
+
+3. Run the `locoApp`.
+
+4. Select a model to play with: `Main Menu > Character > Model`. We have `Bob` and `Dog` for examples.
+
+![Screen](img/screen.png)
+
+5. Press the space bar to play the app. You can give joystick command with arrow keys in your keyboard. If it does not
+   move, don't freak out. It's normal. You have to implement a base (body) trajectory planning strategy as well as a
+   inverse kinematics solver: recall [a1](https://github.com/Digital-Humans-23/a1). 
+
 ## Immediate Next steps
 
-- Implement an inverse kinematics solver: ```src/libs/loco/include/loco/kinematics/IK_Solver.h```
-    - Complete TODO part.
-    - Feel free to modify and use the one from [a1](https://github.com/Digital-Humans-23/a1)
+- Implement an inverse kinematics solver: ```src/libs/loco/include/loco/kinematics/IK_Solver.h```. Complete TODO part.
 - Complete a base (body) trajectory planning
   strategy: ```src/libs/loco/include/loco/planner/LocomotionPlannerHelpers.h```
-    - Feel free to modify and use the one from [a1](https://github.com/Digital-Humans-23/a1)
 - Design a strategy for arm motions. Modify ```src/libs/loco/include/loco/planner``` files to implement your strategy.
 - Review biomechanics, computer graphics and robotics literature for a natural ankle motion. This is the most
   crucial step for successful demo!

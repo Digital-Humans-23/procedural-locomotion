@@ -126,7 +126,7 @@ public:
         ImGui::Begin("Main Menu");
         ImGui::Checkbox("Follow Robot with Camera", &followRobotWithCamera);
         if (ImGui::CollapsingHeader("Character")) {
-            drawComboMenu("Character##character", modelOptions, selectedModel);
+            drawComboMenu("Model##character", modelOptions, selectedModel);
         }
         if (ImGui::CollapsingHeader("Draw")) {
             if (ImGui::Checkbox("Show meshes", &robot_->showMeshes)) {
